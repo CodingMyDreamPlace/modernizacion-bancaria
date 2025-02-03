@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Gestión de Clientes</h1>
+        <form id="add-client-form" class="mt-4">
+            <div class="form-group">
+                <label for="name">Nombre</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Dirección</label>
+                <input type="text" class="form-control" id="address">
+            </div>
+            <div class="form-group">
+                <label for="phone">Teléfono</label>
+                <input type="text" class="form-control" id="phone">
+            </div>
+            <button type="submit" class="btn btn-primary">Añadir Cliente</button>
+        </form>
+        <table class="table table-striped mt-5">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="clients-table">
+                <!-- Los datos de los clientes se añadirán aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Función para cargar los clientes
+            function loadClients() {
+                $.getJSON('/clients', function(data) {
+                    let clientsTable = $('#clients-table');
+                    clientsTable.empty();
+                    data.forEach(function(client) {
+                        clientsTable.append(`
+                            <tr>
+                                <td>${client.id}</td>
+                                <td>${client.name}</td>
+                                <td>${client.address}</td>
+                                <td>${client.phone}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm edit-client" data-id="${client.id}">Editar</button>
+                                    <button class="btn btn-danger btn-sm delete-client" data-id="${client.id}">Eliminar</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log('Error al cargar clientes:', textStatus, errorThrown);
+                });
+            }
+
+            // Cargar los clientes cuando la página se cargue
+            loadClients();
+
+            // Manejar el envío del formulario de añadir cliente
+            $('#add-client-form').submit(function(event) {
+                event.preventDefault();
+                let newClient = {
+                    name: $('#name').val(),
+                    address: $('#address').val(),
+                    phone: $('#phone').val()
+                };
+                $.ajax({
+                    url: '/clients',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(newClient),
+                    success: function() {
+                        loadClients();
+                        $('#add-client-form')[0].reset();
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log('Error al añadir cliente:', textStatus, errorThrown);
+                });
+            });
+
+            // Manejar la funcionalidad del botón "Eliminar"
+            $(document).on('click', '.delete-client', function() {
+                let clientId = $(this).data('id');
+                $.ajax({
+                    url: `/clients/${clientId}`,
+                    method: 'DELETE',
+                    success: function() {
+                        loadClients();
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log('Error al eliminar cliente:', textStatus, errorThrown);
+                });
+            });
+
+            // Manejar la funcionalidad del botón "Editar"
+            $(document).on('click', '.edit-client', function() {
+                let clientId = $(this).data('id');
+                // Aquí puedes añadir un formulario de edición o un modal para actualizar la información del cliente
+                let newName = prompt('Nuevo nombre:');
+                let newAddress = prompt('Nueva dirección:');
+                let newPhone = prompt('Nuevo teléfono:');
+                if (newName && newAddress && newPhone) {
+                    let updatedClient = {
+                        name: newName,
+                        address: newAddress,
+                        phone: newPhone
+                    };
+                    $.ajax({
+                        url: `/clients/${clientId}`,
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(updatedClient),
+                        success: function() {
+                            loadClients();
+                        }
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                        console.log('Error al actualizar cliente:', textStatus, errorThrown);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
