@@ -23,3 +23,9 @@ Abre tu navegador web y ve a http://localhost:5000 para acceder a la aplicación
 
 **Base de Datos**
 El proyecto incluye una base de datos SQLite (database.db) ya poblada con datos de ejemplo. Si deseas utilizar una base de datos nueva, puedes eliminar database.db y ejecutar los scripts SQL proporcionados para crear una base de datos nueva.
+
+EJEMPLO: 
+![docker build](https://github.com/user-attachments/assets/28411beb-7ae0-4c4b-9c67-6bbf298d6ccd)
+![HTML -1](https://github.com/user-attachments/assets/6c6a3b56-6bf7-4fa7-b3af-12d02c3aa7d7)
+![Json](https://github.com/user-attachments/assets/0378fdad-b184-4cee-ba82-97be3dd22686)
+
